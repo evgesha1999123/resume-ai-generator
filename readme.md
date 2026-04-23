@@ -4,10 +4,10 @@
 
 **Автоматическая генерация IT-резюме на основе анализа Git-репозиториев**
 
-[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![RabbitMQ](https://img.shields.io/badge/Rabbitmq-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)](https://www.rabbitmq.com/)
-[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
-[![MinIO](https://img.shields.io/badge/MinIO-C72A48?style=for-the-badge&logo=minio&logoColor=white)](https://min.io/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge\&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![RabbitMQ](https://img.shields.io/badge/Rabbitmq-FF6600?style=for-the-badge\&logo=rabbitmq\&logoColor=white)](https://www.rabbitmq.com/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge\&logo=openai\&logoColor=white)](https://openai.com/)
+[![MinIO](https://img.shields.io/badge/MinIO-C72A48?style=for-the-badge\&logo=minio\&logoColor=white)](https://min.io/)
 
 </div>
 
@@ -15,71 +15,147 @@
 
 ## 📖 О проекте
 
-Сервис анализирует **публичные Git-репозитории** (GitHub, GitLab, GitFlic) и на основе кода, структуры проекта и README автоматически генерирует персонализированное резюме разработчика в формате `.pdf` или `.docx` с помощью **OpenAI**.
+Сервис анализирует **публичные Git-репозитории** (GitHub, GitLab, GitFlic) и на основе:
 
-> 🎯 **Цель** — превратить «цифровой след» разработчика в готовый, профессиональный документ за считанные минуты.
+* кода
+* структуры проекта
+* README
+
+генерирует персонализированное резюме разработчика в формате:
+
+👉 `.pdf` / `.docx` с помощью **OpenAI**
+
+> 🎯 Превращает «цифровой след» разработчика в готовое профессиональное резюме за считанные минуты
 
 ---
 
-## 🧠 Архитектура и поток данных
-
-Система построена на **асинхронной обработке задач** для работы с долгими операциями (клон репозитория, AI-генерация, постобработка).
+## 🧠 Архитектура системы
 
 ```mermaid
 graph TD
-    A[📡 FastAPI GET /resume] --> B[(🗄️ PostgreSQL)]
-    B --> C[🐇 RabbitMQ Listener]
+    A[📡 FastAPI API] --> B[(🗄 PostgreSQL)]
+    B --> C[🐇 RabbitMQ]
     C --> D[🔍 Git Analyzer]
-    D --> E[🌐 Client API Git]
-    D --> F[📦 Git Dependencies Parser]
-    F --> G[(📋 ProjectInformationSchema)]
+    D --> E[🌐 Git API Client]
+    D --> F[📦 Dependencies Parser]
+    F --> G[(📋 Project Schema)]
     G --> H[🤖 OpenAI API]
-    H --> I[✅ ResumeValidator]
-    I --> J[📄 ResumeBuilder]
-    J --> K[💾 MinioRepo]
+    H --> I[✅ Validator]
+    I --> J[📄 Resume Builder]
+    J --> K[💾 MinIO]
     K --> L[🔌 WebSocket / SSE]
-⚙️ Этапы работы
-```mermaid
-1️⃣ Прием задачи
-FastAPI получает user_id и git_url.
+```
 
-Данные сохраняются в БД вместе с уникальным task_id.
+---
 
-Задача публикуется в RabbitMQ для асинхронной обработки.
+## ⚙️ Pipeline обработки
 
-2️⃣ Анализ репозитория
-Git analyzer выполняет глубокий анализ:
+### 1️⃣ Прием задачи
 
-Что анализируется	Источник	Извлекаемая информация
-📄 README.md	/readme	Цели проекта, примеры использования, архитектура
-📝 Description + Topics	/repo	Краткое описание (если нет README)
-🗂️ Структура папок	/git/trees	MVC, src/, notebooks/, cli/ и т.д.
-🌍 Языки	/languages	Стек технологий (Python, Go, JS и др.)
-📦 Зависимости	package.json, requirements.txt, go.mod, pom.xml	Библиотеки и фреймворки
-3️⃣ Формирование модели (ProjectInformationSchema)
-Все данные структурируются в единую схему:
+* FastAPI принимает `user_id` и `git_url`
+* создаётся уникальный `task_id`
+* задача отправляется в очередь (**RabbitMQ**)
 
-python
+---
+
+### 2️⃣ Анализ репозитория
+
+| Источник                | Что извлекается                                  |
+| ----------------------- | ------------------------------------------------ |
+| 📄 README               | цели проекта, архитектура, примеры использования |
+| 📝 Description / Topics | краткое описание проекта                         |
+| 🗂 Структура            | организация кода (src, mvc, cli и т.д.)          |
+| 🌍 Languages            | стек технологий                                  |
+| 📦 Dependencies         | библиотеки и фреймворки                          |
+
+---
+
+### 3️⃣ Формирование модели
+
+```python
 class ProjectInformationSchema:
     general: GeneralInfoSchema      # readme, description, topics
     stack_info: StackInfo           # languages, dependencies
-    structure: list[str]            # структура папок
-
-4️⃣ AI-генерация
-Модель преобразуется в оптимизированный промпт.
-
-Отправка в OpenAI API (модель gpt-4 или выше).
-
-На выходе — Markdown с черновиком резюме.
-
-5️⃣ Постобработка
-Компонент	Задача
-ResumeValidator	Проверка на галлюцинации, соответствие стеку технологий
-ResumePostProcessor	Приведение к формату: «Опыт», «Навыки», «Проекты»
-6️⃣ Сборка и доставка
-ResumeBuilder генерирует финальный файл (.pdf / .docx).
-
-MinioRepo сохраняет файл в S3-совместимое хранилище (папка user_id).
-
-WebSocket / SSE отправляет пользователю ссылку на скачивание.
+    structure: list[str]            # структура проекта
 ```
+
+---
+
+### 4️⃣ AI-генерация
+
+* формируется оптимизированный prompt
+* отправка в OpenAI API
+* результат → **Markdown-резюме**
+
+---
+
+### 5️⃣ Постобработка
+
+| Компонент              | Назначение                                      |
+| ---------------------- | ----------------------------------------------- |
+| ✅ ResumeValidator      | проверка корректности и устранение галлюцинаций |
+| 🛠 ResumePostProcessor | приведение к структуре (Опыт, Навыки, Проекты)  |
+
+---
+
+### 6️⃣ Сборка и доставка
+
+* 📄 Генерация `.pdf` / `.docx`
+* 💾 Сохранение в MinIO (S3-совместимое хранилище)
+* 🔗 Отправка ссылки через WebSocket / SSE
+
+---
+
+## 🧩 Технологии
+
+* ⚡ FastAPI
+* 🐇 RabbitMQ
+* 🗄 PostgreSQL
+* 🤖 OpenAI API
+* 💾 MinIO
+
+---
+
+## ✨ Особенности
+
+* Асинхронная архитектура
+* Глубокий анализ Git-репозиториев
+* Генерация резюме с помощью AI
+* Поддержка нескольких Git-платформ
+* Экспорт в PDF и DOCX
+
+---
+
+## 📌 Roadmap
+
+* [ ] Поддержка приватных репозиториев
+* [ ] Web-интерфейс
+* [ ] Кастомные шаблоны резюме
+* [ ] Анализ Git history (вклад разработчика)
+
+---
+
+## 🚀 Быстрый старт (пример)
+
+```bash
+git clone https://github.com/your-repo/ai-resume-builder.git
+cd ai-resume-builder
+
+docker-compose up --build
+```
+
+---
+
+## 📬 API пример
+
+```http
+GET /resume?git_url=https://github.com/user/repo&user_id=123
+```
+
+---
+
+<div align="center">
+
+### 🔥 Сделай своё резюме из кода — автоматически
+
+</div>
