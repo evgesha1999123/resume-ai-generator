@@ -26,18 +26,18 @@
 Система построена на **асинхронной обработке задач** для работы с долгими операциями (клон репозитория, AI-генерация, постобработка).
 
 ```mermaid
-    A[📡 FastAPI>GET /resume] --> B[(🗄️ PostgreSQL)];
-    B --> C[🐇 RabbitMQListener];
-    C --> D[🔍 Git Analyzer];
-    D --> E[🌐 Client API Git];
-    D --> F[📦 Git Dependense Parser];
-    F --> G[(📋 ProjectInformationSchema)];
-    G --> H[🤖 OpenAI API];
-    H --> I[✅ ResumeValidator];
-    I --> J[📄 ResumeBuilder];
-    J --> K[💾 MinioRepo];
-    K --> L[🔌 WebSocket/SSE];
-```
+graph TD
+    A[📡 FastAPI GET /resume] --> B[(🗄️ PostgreSQL)]
+    B --> C[🐇 RabbitMQ Listener]
+    C --> D[🔍 Git Analyzer]
+    D --> E[🌐 Client API Git]
+    D --> F[📦 Git Dependencies Parser]
+    F --> G[(📋 ProjectInformationSchema)]
+    G --> H[🤖 OpenAI API]
+    H --> I[✅ ResumeValidator]
+    I --> J[📄 ResumeBuilder]
+    J --> K[💾 MinioRepo]
+    K --> L[🔌 WebSocket / SSE]
 ⚙️ Этапы работы
 ```mermaid
 1️⃣ Прием задачи
@@ -46,9 +46,7 @@ FastAPI получает user_id и git_url.
 Данные сохраняются в БД вместе с уникальным task_id.
 
 Задача публикуется в RabbitMQ для асинхронной обработки.
-```
 
-```mermaid
 2️⃣ Анализ репозитория
 Git analyzer выполняет глубокий анализ:
 
@@ -66,18 +64,14 @@ class ProjectInformationSchema:
     general: GeneralInfoSchema      # readme, description, topics
     stack_info: StackInfo           # languages, dependencies
     structure: list[str]            # структура папок
-```
 
-```mermaid
 4️⃣ AI-генерация
 Модель преобразуется в оптимизированный промпт.
 
 Отправка в OpenAI API (модель gpt-4 или выше).
 
 На выходе — Markdown с черновиком резюме.
-```
 
-```mermaid
 5️⃣ Постобработка
 Компонент	Задача
 ResumeValidator	Проверка на галлюцинации, соответствие стеку технологий
