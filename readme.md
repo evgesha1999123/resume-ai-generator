@@ -29,25 +29,6 @@
 
 ---
 
-## 🧠 Архитектура системы
-
-```mermaid
-graph TD
-    A[📡 FastAPI API] --> B[(🗄 PostgreSQL)]
-    B --> C[🐇 RabbitMQ]
-    C --> D[🔍 Git Analyzer]
-    D --> E[🌐 Git API Client]
-    D --> F[📦 Dependencies Parser]
-    F --> G[(📋 Project Schema)]
-    G --> H[🤖 OpenAI API]
-    H --> I[✅ Validator]
-    I --> J[📄 Resume Builder]
-    J --> K[💾 MinIO]
-    K --> L[🔌 WebSocket / SSE]
-```
-
----
-
 ## ⚙️ Pipeline обработки
 
 ### 1️⃣ Прием задачи
@@ -128,7 +109,7 @@ class ProjectInformationSchema:
 
 ## 📌 Roadmap
 
-* [ ] Поддержка приватных репозиториев
+* [ ] Поддержка публичных репозиториев
 * [ ] Web-интерфейс
 * [ ] Кастомные шаблоны резюме
 * [ ] Анализ Git history (вклад разработчика)
