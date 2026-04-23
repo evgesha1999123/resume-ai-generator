@@ -7,6 +7,10 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.13"
+httpx = "^0.28.1"
+pydantic = "^2.13.3"
+pydantic-core = "^2.46.3"
+pydantic-settings = "^2.14.0"
 
 
 [build-system]
