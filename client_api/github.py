@@ -1,6 +1,5 @@
-import asyncio
 from typing import Any
-from pprint import pprint
+
 from client_api.base import BaseGitApiClient
 from settings import Settings
 
@@ -75,17 +74,11 @@ class GitHubAPIClient(BaseGitApiClient):
 
 async def use_case():
     client = GitHubAPIClient(access_token=Settings().github_api.ACCESS_TOKEN)
-    # response = await client.get_readme(owner="evgesha1999123", repo="resume-ai-generator")
     default_branch_sha = await get_default_branch_sha(client)
 
     project_tree_response = await client.get_project_tree("flutter", "engine", default_branch_sha, True)
     with open("tree.json", mode="w+", encoding="utf-8") as f:
         f.write(str(project_tree_response))
-    # pprint(project_tree_response.json())
-
-    # print(response.text)
-    # print(response.status_code)
-    # pprint(response.json())
 
 def find_default_branch_sha(response_json: list[dict[str, Any]]) -> str | None:
     for branch in response_json:
@@ -109,11 +102,3 @@ async def get_default_branch_sha(client: GitHubAPIClient) -> str:
         default_branch_sha = find_default_branch_sha(response_json)
         current_page += 1
     return default_branch_sha
-
-async def watch_projects(client: GitHubAPIClient) -> None:
-    user = "evgesha1999123"
-    pprint(await client.get_projects(user))
-
-
-if __name__ == '__main__':
-    asyncio.run(watch_projects(GitHubAPIClient(access_token=Settings().github_api.ACCESS_TOKEN)))
