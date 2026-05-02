@@ -8,7 +8,7 @@ __pycache__/
 
 #Drawio docs cache
 *.dtmp
-*.bup
+*.bkp
 
 # Distribution / packaging
 .Python

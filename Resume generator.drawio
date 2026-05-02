@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.6 Chrome/144.0.7559.236 Electron/40.8.4 Safari/537.36" version="29.6.6">
   <diagram name="Страница-1" id="bgi4P8zJ0a-jHpyxTjU5">
-    <mxGraphModel dx="4901" dy="2426" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2505" dy="999" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -32,7 +32,7 @@
             <mxPoint x="1230" y="269.8620689655173" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="L88dOMJzLpqxjJxiGPYl-15" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Git analyzer&lt;/font&gt;&lt;br&gt;Выполняет анализ репозитория github / gitflic / gitlab по части стека пользователя. Делает резюмирующий краткий анализ файлов Readme.md.&amp;nbsp;&lt;br&gt;На выходе должен отдать модель с общей характеристикой пользователя (используемый стек технологий, языки проекты, интересные решения, итд.).&lt;br&gt;Модель должна удовлетворять соответствующим критериям качества для идеального резюме." vertex="1">
+        <mxCell id="L88dOMJzLpqxjJxiGPYl-15" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Git analyzer&lt;/font&gt;&lt;br&gt;Выполняет анализ репозитория github / gitflic / gitlab по части стека пользователя. Делает резюмирующий краткий анализ файлов Readme.md.&amp;nbsp;&lt;br&gt;На выходе должен отдать модель с общей характеристикой пользователя (используемый стек технологий, языки проекты, интересные решения, итд.).&lt;br&gt;Модель должна удовлетворять соответствующим критериям качества для хорошего резюме." vertex="1">
           <mxGeometry height="240" width="240" x="760" y="210" as="geometry" />
         </mxCell>
         <mxCell id="L88dOMJzLpqxjJxiGPYl-17" edge="1" parent="1" source="L88dOMJzLpqxjJxiGPYl-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="L88dOMJzLpqxjJxiGPYl-18">

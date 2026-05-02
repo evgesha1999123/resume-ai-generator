@@ -67,6 +67,7 @@ class Settings(BaseSettings):
     # jwt: JWT = Field(default_factory=JWT)
     github_api: GitHubAPI = Field(default_factory=GitHubAPI)
 
+settings = Settings()
 
 if __name__ == '__main__':
     settings = Settings()
