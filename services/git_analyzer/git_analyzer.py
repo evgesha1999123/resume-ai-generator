@@ -19,7 +19,7 @@ class FilterMode(Enum):
 
     @classmethod
     def all(cls) -> list[Literal]:
-        return [cls.EXCLUDE_ALL.name, cls.INCLUDE_ALL.name]
+        return [cls.EXCLUDE_ALL, cls.INCLUDE_ALL]
 
 
 class GitRepositoryAnalyzer:
