@@ -39,9 +39,17 @@ class BaseGitApiClient(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def get_commit_sha(self, owner: str, repo: str, main_branch_name: str) -> Any:
+    async def get_default_branch_info(self, owner: str, repo: str, default_branch: str) -> Any:
         raise NotImplementedError()
 
     @abstractmethod
     async def get_project_tree(self, owner: str, repo: str, sha: str, recursive: bool) -> Any:
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def get_project_contributors(self, owner: str, repo: str) -> Any:
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def get_dependencies(self, owner: str, repo: str, base: str, head: str) -> Any:
         raise NotImplementedError()

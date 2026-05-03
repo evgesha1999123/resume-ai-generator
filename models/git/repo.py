@@ -3,6 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, HttpUrl
 
+from models.git.dependence_package import DependencePackage
 from models.git.readme import GitHubApiReadme
 from models.git.license import License
 from models.git.user import GitHubUser
@@ -14,9 +15,9 @@ class GeneralGitRepoInfoSchema(BaseModel):
     topics: list[str] = Field(..., description="Топики проекта")
 
 
-class ProjectRequirementsSchema(BaseModel):
+class ProjectDependenciesSchema(BaseModel):
     # TODO: Структуру уточнить
-    requirements: list[str] = Field(
+    dependencies: list[DependencePackage] = Field(
         ..., description="Список зависимостей проекта для анализа используемого стека технологий"
     )
 
@@ -30,7 +31,7 @@ class GitRepoDataSchema(BaseModel):
     general: GeneralGitRepoInfoSchema = Field(
         ..., description="Общая информация для получения базового представления о проекте"
     )
-    requirements: ProjectRequirementsSchema = Field(..., description="Зависимости проекта")
+    dependencies: ProjectDependenciesSchema = Field(..., description="Зависимости проекта")
     structure: ProjectStructureSchema = Field(..., description="Сведения о структуре и архитектуре проекта")
 
 
@@ -77,6 +78,8 @@ class NativeGitRepoSchema(BaseModel):
     url: HttpUrl = Field(..., description="Url репозитория проекта")
 
     visibility: str = Field(..., description="Тип видимости репозитория, напр. 'public'")
+
+    default_branch: str = Field(..., description="Основная ветка проекта")
 
     class Config:
         extra = "ignore"
