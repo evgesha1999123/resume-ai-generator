@@ -4,7 +4,8 @@ from typing import Literal
 
 from client_api.base import BaseGitApiClient
 from core.di import container
-from models.git.repo import GitRepoDataSchema, NativeGitRepoSchema, GeneralGitRepoInfoSchema
+from models.git.readme import GitHubApiReadme
+from models.git.repo import NativeGitRepoSchema, GeneralGitRepoInfoSchema
 
 
 class FilterMode(Enum):
@@ -67,15 +68,23 @@ class GitRepositoryAnalyzer:
             self.repos = self.repos_cache
 
     async def get_general_repo_infos(self) -> list[GeneralGitRepoInfoSchema]:
-        pass
+        general_git_repo_info_schemas: list[GeneralGitRepoInfoSchema] = []
+        for repo in self.repos:
+            readme_response: dict = await self.client.get_readme(owner=repo.owner.login, repo=repo.name)
+            general_git_repo_info_schemas.append(
+                GeneralGitRepoInfoSchema(
+                    readme=GitHubApiReadme(**readme_response) if readme_response else None,
+                    description=repo.description,
+                    topics=repo.topics)
+            )
+        return general_git_repo_info_schemas
 
-    async def get_get_repo_infos(self) -> list[GitRepoDataSchema]:
-        pass
 
 async def use_case():
     analyzer = GitRepositoryAnalyzer(git_client=container.get(BaseGitApiClient), user_profile_name="evgesha1999123")
     await analyzer.get_user_repos()
     print(len(analyzer.filter_repos(FilterMode.EXCLUDE, ["autopoweroff", "medical-parser", "Rainy", "test_orm"])))
+    print(await analyzer.get_general_repo_infos())
 
 
 if __name__ == '__main__':

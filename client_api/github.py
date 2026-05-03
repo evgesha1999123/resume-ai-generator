@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any
 
 from client_api.base import BaseGitApiClient
@@ -9,24 +10,24 @@ class GitHubAPIClient(BaseGitApiClient):
         super().__init__(base_url, access_token, timeout)
 
     async def get_projects(self, profile_name: str) -> dict[str, Any]:
-        response = await self.client.get(f"{self.base_url}/users/{profile_name}/repos")
+        response = await self.client.get(f"/users/{profile_name}/repos")
         return response.json()
 
     async def get_emojis(self) -> dict[str, str]:
-        return await self.client.get(f"{self.base_url}/emojis").json()
+        return await self.client.get("/emojis").json()
 
 
     async def get_readme(self, owner: str, repo: str) -> dict[str, Any]:
         response = await self.client.get(
-            url=f"{self.base_url}/repos/{owner}/{repo}/readme",
+            url=f"/repos/{owner}/{repo}/readme",
             headers=self.__put_headers()
         )
-        return response.json()
+        return response.json() if response.status_code == 200 else {}
 
 
     async def get_project_languages(self, owner: str, repo: str) -> dict[str, Any]:
         response = await self.client.get(
-            url=f"{self.base_url}/repos/{owner}/{repo}/languages",
+            url=f"/repos/{owner}/{repo}/languages",
             headers=self.__put_headers()
         )
         return response.json()
@@ -34,7 +35,7 @@ class GitHubAPIClient(BaseGitApiClient):
 
     async def get_project_description(self, owner: str, repo: str) -> dict[str, Any]:
         response = await self.client.get(
-            url=f"{self.base_url}/repos/{owner}/{repo}",
+            url=f"repos/{owner}/{repo}",
             headers=self.__put_headers()
         )
         return response.json()
@@ -42,7 +43,7 @@ class GitHubAPIClient(BaseGitApiClient):
 
     async def get_project_branches(self, owner: str, repo: str, pagination_size: int, page: int) -> list[dict[str, Any]]:
         response = await self.client.get(
-            url=f"{self.base_url}/repos/{owner}/{repo}/branches?per_page={pagination_size}&page={page}",
+            url=f"/repos/{owner}/{repo}/branches?per_page={pagination_size}&page={page}",
             headers=self.__put_headers()
         )
         return response.json()
@@ -50,7 +51,7 @@ class GitHubAPIClient(BaseGitApiClient):
 
     async def get_commit_sha(self, owner: str, repo: str, main_branch_name: str = "main") -> dict[str, Any]:
         response = await self.client.get(
-            url=f"{self.base_url}/repos/{owner}/{repo}/branches/{main_branch_name}",
+            url=f"/repos/{owner}/{repo}/branches/{main_branch_name}",
             headers=self.__put_headers()
         )
         return response.json()
@@ -58,7 +59,16 @@ class GitHubAPIClient(BaseGitApiClient):
 
     async def get_project_tree(self, owner: str, repo: str, sha: str, recursive: bool) -> dict[str, Any]:
         response = await self.client.get(
-            url=f"{self.base_url}/repos/{owner}/{repo}/git/trees/{sha}?recursive={int(recursive)}",
+            url=f"/repos/{owner}/{repo}/git/trees/{sha}?recursive={int(recursive)}",
+            headers=self.__put_headers()
+        )
+        return response.json()
+
+
+    async def get_dependencies(self, owner: str, repo: str, base: str, head: str) -> dict[str, Any]:
+        basehead = f"{base}...{head}"
+        response = await self.client.get(
+            url=f'/repos/{owner}/{repo}/dependency-graph/compare/{basehead}',
             headers=self.__put_headers()
         )
         return response.json()
@@ -66,7 +76,7 @@ class GitHubAPIClient(BaseGitApiClient):
 
     def __put_headers(self) -> dict[str, str]:
         return {
-            "Accept": "application/vnd.github-commitcomment.raw+json",
+            "Accept": "application/json",
             "Authorization": f"Bearer {self.token}",
             "X-GitHub-Api-Version": "2026-03-10",
         }
@@ -102,3 +112,9 @@ async def get_default_branch_sha(client: GitHubAPIClient) -> str:
         default_branch_sha = find_default_branch_sha(response_json)
         current_page += 1
     return default_branch_sha
+
+async def watch_dependencies(client: GitHubAPIClient) -> None:
+    print(await client.get_dependencies("evgesha1999123", "resume-ai-generator", base="e98792f380d82512c563de0a17f5d1ec4fc2ae95", head="fcfc7789fbdcf49744793d8b4ca950ef7022cfe9"))
+
+if __name__ == '__main__':
+    asyncio.run(watch_dependencies(GitHubAPIClient(access_token=Settings().github_api.ACCESS_TOKEN)))

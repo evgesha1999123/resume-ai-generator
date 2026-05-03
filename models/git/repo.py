@@ -3,13 +3,14 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, HttpUrl
 
+from models.git.readme import GitHubApiReadme
 from models.git.license import License
 from models.git.user import GitHubUser
 
 
 class GeneralGitRepoInfoSchema(BaseModel):
-    readme: str = Field(..., description="Readme проекта для общей информации")
-    description: str = Field(..., description="Описание проекта")
+    readme: Optional[GitHubApiReadme] = Field(default=None, description="Readme проекта для общей информации")
+    description: Optional[str] = Field(default="", description="Описание проекта")
     topics: list[str] = Field(..., description="Топики проекта")
 
 
